@@ -4,7 +4,6 @@
 ###
 
 import requests
-import getpass
 from lxml import etree as ET
 
 ##################################
