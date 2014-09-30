@@ -1,6 +1,6 @@
 ###
 # Test script for new WikiPathways webservice API
-# author: msk
+# author: msk (mkutmon@gmail.com)
 ###
 
 import requests
@@ -17,8 +17,6 @@ gpml_file = 'test.gpml'
 
 # define namespaces
 namespaces = {'ns1':'http://www.wso2.org/php/xs','ns2':'http://www.wikipathways.org/webservice'}
-
-print "\n========================\nCREATE PATHWAY\n========================\n"
 
 # login
 pswd = getpass.getpass('Password:')
