@@ -1,16 +1,16 @@
 <html>
  <head>
-  <title>PHP Test</title>
+  <title>PHP Examples for WikiPathways API</title>
  </head>
  <body>
 <?php
 
-  $baseIri = "http://www.wikipathways.org/wpi/webservicetest/";
+  $baseIri = "http://webservice.wikipathways.org/";
   $ns1 = "http://www.wso2.org/php/xsd";
   $ns2 = "http://www.wikipathways.org/webservice";
 
   print "<h1>Pathway Info for WP1</h1>";
-  $wp1Iri = $baseIri . "?pwId=WP1&method=getPathwayInfo&format=xml";
+  $wp1Iri = $baseIri . "getPathwayInfo?pwId=WP1";
   $wp1Dom = DOMDocument::load($wp1Iri);
 
   foreach ($wp1Dom->getElementsByTagNameNS($ns1, 'pathwayInfo') as $pathwayInfo) {
@@ -20,7 +20,7 @@
   }
 
   print "<h1>Pathway History for WP1, from 2011 to Present</h1>";
-  $wp1Iri = $baseIri . "?pwId=WP1&timestamp=20110101000000&method=getPathwayHistory&format=xml";
+  $wp1Iri = $baseIri . "getPathwayHistory?pwId=WP1&timestamp=20110101000000";
   $wp1Dom = DOMDocument::load($wp1Iri);
 
   foreach ($wp1Dom->getElementsByTagNameNS($ns2, 'history') as $history) {
@@ -30,7 +30,7 @@
   }
 
   print "<h1>All Organisms</h1>";
-  $allOrganismsIri = $baseIri . "?method=listOrganisms&format=xml";
+  $allOrganismsIri = $baseIri . "listOrganisms?format=xml";
   $allOrganismsDom = DOMDocument::load($allOrganismsIri);
 
   foreach ($allOrganismsDom->getElementsByTagNameNS($ns1, 'organisms') as $organism) {
@@ -38,7 +38,7 @@
   }
 
   print "<h1>All Pathway Names for Homo sapiens</h1>";
-  $allPathwaysIri = $baseIri . "?organism=Homo+sapiens&method=listPathways&format=xml";
+  $allPathwaysIri = $baseIri . "listPathways?organism=Homo+sapiens";
   $allPathwaysDom = DOMDocument::load($allPathwaysIri);
 
   foreach ($allPathwaysDom->getElementsByTagNameNS($ns1, 'pathways') as $pathway) {
