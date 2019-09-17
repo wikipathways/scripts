@@ -1,0 +1,195 @@
+#!/bin/bash
+
+###
+# Run this script monthly in order to prepare and organize a regularly released set of curated content
+#
+# The script calls upon existing urls to trigger the retrieval or regeneration of an archive set,
+#  e.g., https://wikipathways.org//wpi/batchDownload.php?species=Homo%20sapiens&fileType=gpml&tag=Curation:AnalysisCollection
+#
+# The retrieved files are equivalent to the zipped files found in /wpi/cache, 
+#  e.g., "wikipathways_Homo_sapiens_Curation-AnalysisCollection__gpml.zip" for 
+#  each of the species and file types specified below. 
+#
+# These archived sets are intended to serve as immutable data sources for downstream analyses.
+#
+# The script also stashes a copy of the lucene index into an index subdirectory 
+###
+
+DATA='/var/www/wikipathways-data' 
+DATE=`date +%Y%m%d`
+URL_BASE='https://wikipathways.org/wpi/batchDownload.php' 
+
+## setup dir
+mkdir "$DATA"/"$DATE"
+if ! cp "$DATA"/.index.php.master "$DATA"/"$DATE"/.index.php; then
+        echo "ERROR: Can't copy .index.php to new date dir" >&2
+fi
+
+# tag to collect
+TAG='Curation:AnalysisCollection'
+
+# file types to collect
+declare -a TYPES=(
+'gpml'
+'svg'
+)
+
+## setup dirs
+for h in "${TYPES[@]}"
+do
+        DIR="$DATA"/"$DATE"/"$h"
+	mkdir "$DIR"
+        if ! cp "$DATA"/.index.php.master "$DIR"/.index.php; then
+                echo "ERROR: Can't copy .index.php.master to new data dir for $h" >&2
+        fi
+done
+
+# organisms to collect
+declare -a ORGS=(
+'Anopheles gambiae'
+'Arabidopsis thaliana'
+'Bacillus subtilis'
+'Bos taurus'
+'Caenorhabditis elegans'
+'Canis familiaris'
+'Danio rerio'
+'Drosophila melanogaster'
+'Escherichia coli'
+'Equus caballus'
+'Gallus gallus'
+'Gibberella zeae'
+'Homo sapiens'
+'Hordeum vulgare'
+'Mus musculus'
+'Mycobacterium tuberculosis'
+'Oryza sativa'
+'Pan troglodytes'
+'Plasmodium falciparum'
+'Populus trichocarpa'
+'Rattus norvegicus'
+'Saccharomyces cerevisiae'
+'Solanum lycopersicum'
+'Sus scrofa'
+'Zea mays'
+)
+
+for i in "${ORGS[@]}"
+do
+	echo "$i"
+
+	for j in "${TYPES[@]}"
+	do
+		echo "$j"
+		DIR="$DATA"/"$DATE"/"$j"
+		GS=${i// /_} # replace space character with _ in species name 
+		OUT="$DIR"/wikipathways-"$DATE"-"$j"-"$GS".zip
+		if ! wget "${URL_BASE}?species=$i&fileType=$j&tag=$TAG" -O "$OUT"; then
+			echo "ERROR: Can't get file" >&2
+		fi
+	done
+done
+
+# now stash index files
+IN_DIR="$DATA"/"$DATE"/index
+mkdir "$IN_DIR"
+if ! cp "$DATA"/.index.php.master "$IN_DIR"/.index.php; then
+	echo "ERROR: Can't copy .index.php to new index dir" >&2
+fi
+
+#############
+# DO NOT MAKE PUBLIC DUMPS OF WP DB; IT CONTAINS USER ACCOUNT INFO
+#############
+#BKUP_DIR='/home/wikipathways/backup'
+#BKUP_FILE=wikipathways-"$DATE"*
+#SQL=`find "$BKUP_DIR" -name $BKUP_FILE`
+#SQL_OUT="$IN_DIR"/wikipathways-"$DATE".sql.gz
+#if ! cp "$SQL" "$SQL_OUT"; then
+#	echo "ERROR: Can't copy sql file" >&2
+#fi 
+
+INDEX_DIR='/home/wikipathways/wp-indexer-main/index/'
+INDEX_FILE=wikipathways-"$DATE"-index.tgz
+if ! tar -zcf "$INDEX_FILE" "$INDEX_DIR"; then
+	echo "ERROR: Can't tar gzip index" >&2
+fi
+if ! mv "$INDEX_FILE" "$IN_DIR"/.; then
+	echo "ERROR: Can't move $INDEX_FILE" >&2
+fi
+
+# now retrieve GMT files
+DATE2=`date +%Y%m%d`
+GMT_URL="http://data.wikipathways.org/java-bots/gmt/$DATE2"
+echo $GMT_URL
+GMT_DIR="$DATA"/"$DATE"/gmt
+mkdir "$GMT_DIR"
+if ! cp "$DATA"/.index.php.master "$GMT_DIR"/.index.php; then
+        echo "ERROR: Can't copy .index.php.master to new gmt dir" >&2
+fi
+
+for i in "${ORGS[@]}"
+do
+        echo "$i"
+        GS=${i// /_} # replace space character with _ in species name
+        OUT="$GMT_DIR"/wikipathways-"$DATE"-gmt-"$GS".gmt
+        if ! wget "${GMT_URL}/gmt_wp_$GS.gmt" -O "$OUT"; then
+                echo "ERROR: Can't get file" >&2
+        fi
+done
+
+find "$GMT_DIR" -size 0 -print0|xargs -0 rm
+
+# now get RDF release
+RDF_DIR="$DATA"/"$DATE"/rdf
+mkdir "$RDF_DIR"
+if ! cp "$DATA"/.index.php.master "$RDF_DIR"/.index.php; then
+        echo "ERROR: Can't copy .index.php.master to new rdf dir" >&2
+fi
+
+OUT="$RDF_DIR"/wikipathways-"$DATE"-rdf-gpml.zip
+if ! wget --no-check-certificate https://jenkins.bigcat.unimaas.nl/job/GPML%20to%20GPML%20+%20WP%20RDF%20%28Monthly%20Download%29/ws/WP2RDF/output/gpml/*zip*/gpml.zip -O "$OUT"; then
+        cho "ERROR: Can't get file" >&2
+fi
+
+OUT="$RDF_DIR"/wikipathways-"$DATE"-rdf-wp.zip
+if ! wget --no-check-certificate https://jenkins.bigcat.unimaas.nl/job/GPML%20to%20GPML%20+%20WP%20RDF%20%28Monthly%20Download%29/ws/WP2RDF/output/wp/*zip*/wp.zip -O "$OUT"; then
+        cho "ERROR: Can't get file" >&2
+fi
+
+OUT="$RDF_DIR"/wikipathways-"$DATE"-rdf-void.ttl
+if ! wget --no-check-certificate https://jenkins.bigcat.unimaas.nl/job/GPML%20to%20GPML%20+%20WP%20RDF%20%28Monthly%20Download%29/ws/WP2RDF/output/void_for_data.wp.org.ttl -O "$OUT"; then
+        cho "ERROR: Can't get file" >&2
+fi
+
+# remake current dir with symlinks and special index.php for gpmls
+CUR_DIR="$DATA"/current
+rm -r "$CUR_DIR"
+mkdir "$CUR_DIR"
+if ! cp "$DATA"/.index.php.master "$CUR_DIR"/.index.php; then
+        echo "ERROR: Can't copy .index.php.master to new current dir" >&2
+fi
+
+ln -s "$DATA"/"$DATE"/gmt "$CUR_DIR"/gmt
+ln -s "$DATA"/"$DATE"/index "$CUR_DIR"/index
+ln -s "$DATA"/"$DATE"/rdf "$CUR_DIR"/rdf
+ln -s "$DATA"/"$DATE"/svg "$CUR_DIR"/svg
+
+## SIMPLE CURRENT GPML DIR
+ln -s "$DATA"/"$DATE"/gpml "$CUR_DIR"/gpml
+
+## COMPLEX CURRENT GPML DIR: special hrefs and symlinks
+#mkdir "$CUR_DIR"/gpml
+#if ! cp "$DATA"/.index.php.gpml-master "$CUR_DIR"/gpml/.index.php; then
+#        echo "ERROR: Can't copy .index.php.gpml-master to new current gpml dir" >&2
+#fi
+## update index.php to enable generic links to date-specific file
+#sed -i "s/\$releaseDate\=\"[0-9]\+\"\;/\$releaseDate\=\"$DATE\"\;/" "$CUR_DIR"/gpml/.index.php
+#
+#for i in "${ORGS[@]}"
+#do
+#	GS=${i// /_} # replace space character with _ in species name 
+#	SOURCE="$DATA"/"$DATE"/gpml/wikipathways-"$DATE"-gpml-"$GS".zip
+#	TARGET="$DATA"/current/gpml/wikipathways-current-gpml-"$GS".zip
+#	ln -s "$SOURCE" "$TARGET"
+#done
+
+#done!
