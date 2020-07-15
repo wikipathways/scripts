@@ -146,17 +146,17 @@ if ! cp "$DATA"/.index.php.master "$RDF_DIR"/.index.php; then
 fi
 
 OUT="$RDF_DIR"/wikipathways-"$DATE"-rdf-gpml.zip
-if ! wget --no-check-certificate https://jenkins.bigcat.unimaas.nl/job/GPML%20to%20GPML%20+%20WP%20RDF%20%28Monthly%20Download%29/lastSuccessfulBuild/artifact/WP2RDF/output/gpml/*zip*/gpml.zip -O "$OUT"; then
+if ! wget --no-check-certificate https://jenkins.bigcat.unimaas.nl/job/WikiPathways%20RDF%20-%20Monthly/lastSuccessfulBuild/artifact/WP2RDF/output/wikipathways-rdf-gpml.zip -O "$OUT"; then
         cho "ERROR: Can't get file" >&2
 fi
 
 OUT="$RDF_DIR"/wikipathways-"$DATE"-rdf-wp.zip
-if ! wget --no-check-certificate https://jenkins.bigcat.unimaas.nl/job/GPML%20to%20GPML%20+%20WP%20RDF%20%28Monthly%20Download%29/lastSuccessfulBuild/artifact/WP2RDF/output/wp/*zip*/wp.zip -O "$OUT"; then
+if ! wget --no-check-certificate https://jenkins.bigcat.unimaas.nl/job/WikiPathways%20RDF%20-%20Monthly/lastSuccessfulBuild/artifact/WP2RDF/output/wikipathways-rdf-wp.zip -O "$OUT"; then
         cho "ERROR: Can't get file" >&2
 fi
 
 OUT="$RDF_DIR"/wikipathways-"$DATE"-rdf-void.ttl
-if ! wget --no-check-certificate https://jenkins.bigcat.unimaas.nl/job/GPML%20to%20GPML%20+%20WP%20RDF%20%28Monthly%20Download%29/lastSuccessfulBuild/artifact/WP2RDF/output/void_for_data.wp.org.ttl -O "$OUT"; then
+if ! wget --no-check-certificate https://jenkins.bigcat.unimaas.nl/job/WikiPathways%20RDF%20-%20Monthly/lastSuccessfulBuild/artifact/WP2RDF/output/void_for_data.wp.org.ttl -O "$OUT"; then
         cho "ERROR: Can't get file" >&2
 fi
 
