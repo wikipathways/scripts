@@ -155,7 +155,7 @@ wpa.ttl2 <- wpa.ttl %>%
 orcid.ttl <- orcid.df3 %>%
   mutate(o1 = paste0('<http://rdf.wikipathways.org/User/',userName,'>')) %>%
   mutate(p2a = "owl:sameAs") %>%
-  mutate(o2a = paste0('<https://www.wikidata.org/entity/',wikidata,'>')) %>%
+  mutate(o2a = paste0('<http://www.wikidata.org/entity/',wikidata,'>')) %>%
   mutate(p2b = "dc:identifier") %>%
   mutate(o2b = paste0('<https://orcid.org/',orcid,'>')) %>%
   dplyr::select(o1,p2a,o2a,p2b,o2b)
