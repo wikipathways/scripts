@@ -52,7 +52,7 @@
         sort($dirArray);
         
         // Loops through the array of files
-        for($index=0; $index < $indexCount; $index++) {
+	for($index=$indexCount-1; $index >= 0; $index--) {
         
           // Allows ./?hidden to show hidden files
           if($_SERVER['QUERY_STRING']=="hidden")
