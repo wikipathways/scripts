@@ -25,10 +25,10 @@ or
 ### wmcloud
 Dashboard: https://horizon.wikimedia.org/project/ (requires login)
 
-Instance
- - Name: data, 4 VCPUs, 	20GB Disk, 8GB RAM
+Instance:
+ - Name: data, VCPUs: 4, 	Disk: 20GB, RAM: 8GB
 
-Volume
+Volume:
  - Name: data.wikipathways.org, Size: 21GiB, Status: In-use, Type: standard, Attach: /dev/sdb on data, Zone: nova, Bootable: No, Encrypted: No 
 
 ### Toolforge
