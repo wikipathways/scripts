@@ -23,7 +23,7 @@ or
 
 ## Deployment
 ### wmcloud
-Dashboard: https://horizon.wikimedia.org/project/ (required login)
+Dashboard: https://horizon.wikimedia.org/project/ (requires login)
 
 Instance
  - Name: data, 4 VCPUs, 	20GB Disk, 8GB RAM
