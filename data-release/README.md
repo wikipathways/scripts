@@ -31,5 +31,7 @@ Instance:
 Volume:
  - Name: data.wikipathways.org, Size: 21GiB, Status: In-use, Type: standard, Attach: /dev/sdb on data, Zone: nova, Bootable: No, Encrypted: No 
 
+See [full docs](https://docs.google.com/document/d/1evmOaC58oFvX38Lv81BpUWKbXW--ASic9U5R9tRrTfM/edit#) (requires login)
+
 ### Toolforge
 The directory `/data/projects/wikipathways-data/public_html` is an existing directory on wikipathways-data.toolforge.org, and it's intended to hold the WikiPathways release data. This has been replaced by the wmcloud service above, but is still around in case of backup.
